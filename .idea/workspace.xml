@@ -2,8 +2,6 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="755e8bb3-45e4-496f-84df-1a812dd7da65" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/cuon-matrix.js" beforeDir="false" afterPath="$PROJECT_DIR$/lib/cuon-matrix.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main.js" beforeDir="false" afterPath="$PROJECT_DIR$/main.js" afterDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/.tmp/" />
@@ -20,8 +18,8 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/main.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="97">
-              <caret line="341" column="29" selection-start-line="341" selection-start-column="29" selection-end-line="341" selection-end-column="29" />
+            <state relative-caret-position="127">
+              <caret line="122" column="16" selection-start-line="122" selection-start-column="16" selection-end-line="122" selection-end-column="16" />
               <folding>
                 <element signature="n#!!doc" expanded="true" />
               </folding>
@@ -50,8 +48,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/lib/cuon-matrix.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="380">
-              <caret line="788" column="26" lean-forward="true" selection-start-line="788" selection-start-column="26" selection-end-line="788" selection-end-column="26" />
+            <state relative-caret-position="747">
+              <caret line="758" selection-start-line="758" selection-end-line="758" />
             </state>
           </provider>
         </entry>
@@ -87,9 +85,9 @@
     </option>
   </component>
   <component name="ProjectFrameBounds">
-    <option name="x" value="174" />
+    <option name="x" value="870" />
     <option name="y" value="23" />
-    <option name="width" value="1600" />
+    <option name="width" value="1028" />
     <option name="height" value="1157" />
   </component>
   <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
@@ -146,19 +144,19 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1582234264160</updated>
-      <workItem from="1582234265445" duration="13902000" />
+      <workItem from="1582234265445" duration="18714000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="13902000" />
+    <option name="totallyTimeSpent" value="18714000" />
   </component>
   <component name="ToolWindowManager">
-    <frame x="174" y="23" width="1600" height="1157" extended-state="0" />
+    <frame x="870" y="23" width="1028" height="1157" extended-state="0" />
     <editor active="true" />
     <layout>
       <window_info id="Favorites" side_tool="true" />
-      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.24952501" />
+      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.17179742" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info anchor="bottom" id="Docker" show_stripe_button="false" />
       <window_info anchor="bottom" id="Version Control" />
@@ -203,15 +201,15 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/lib/cuon-matrix.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="380">
-          <caret line="788" column="26" lean-forward="true" selection-start-line="788" selection-start-column="26" selection-end-line="788" selection-end-column="26" />
+        <state relative-caret-position="747">
+          <caret line="758" selection-start-line="758" selection-end-line="758" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/main.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="97">
-          <caret line="341" column="29" selection-start-line="341" selection-start-column="29" selection-end-line="341" selection-end-column="29" />
+        <state relative-caret-position="127">
+          <caret line="122" column="16" selection-start-line="122" selection-start-column="16" selection-end-line="122" selection-end-column="16" />
           <folding>
             <element signature="n#!!doc" expanded="true" />
           </folding>

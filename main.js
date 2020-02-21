@@ -38,12 +38,46 @@ let u_Sampler;
 let u_Text;
 let u_Color;
 let eyeObj = {};
-let G_STEP = .05;
+const G_STEP = .1;
+const G_ANGLE = 1;
 
-let array = [[1, 0, 0, 1],
-    [1, 1, 0, 1],
-    [1, 0, 0, 1],
-    [1, 1, 1, 1]];
+let array = [[1, 0, 0, 2],
+             [3, 2, 0, 1],
+             [1, 0, 0, 1],
+             [1, 1, 1, 1]];
+
+let bigArr = [[0,0,0,0,0,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3], //1
+              [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3], //2
+              [0,1,0,1,2,1,0,0,0,0,0,2,1,1,1,1,2,3,0,0,0,0,0,0,0,0,0,0,0,0,0,3], //3
+              [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3], //4
+              [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3], //5
+              [3,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,1,1,1,0,0,0,0,0,0,0,0,3], //6
+              [3,1,1,1,0,0,2,2,2,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3], //7
+              [3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3], //8
+              [3,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,2,2,3,3,3,3,3,3,3,3,3,3,3,3], //9
+              [3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3], //11
+              [3,1,0,1,2,1,0,0,0,0,0,2,1,1,1,1,2,3,0,0,0,0,0,0,0,0,0,0,0,0,0,3], //12
+              [3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3], //13
+              [3,0,0,0,1,0,0,1,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3], //14
+              [3,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,1,1,1,0,0,0,0,0,0,0,0,3], //15
+              [3,1,1,1,0,0,2,2,2,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3], //16
+              [3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3], //17
+              [3,2,2,2,2,1,1,2,1,2,1,0,0,0,0,0,0,0,0,1,3,3,3,3,3,3,3,3,3,3,3,3], //18
+              [3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3], //19
+              [3,1,0,1,2,1,0,0,0,0,0,2,1,1,1,1,2,3,0,0,0,0,0,0,0,0,0,0,0,0,0,3], //20
+              [3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,0,0,3], //21
+              [3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3], //22
+              [3,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,1,1,1,0,0,0,0,0,0,0,0,3], //23
+              [3,1,1,1,0,0,2,2,2,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3], //24
+              [3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3], //25
+              [3,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,2,2,3,3,3,3,3,3,3,3,3,3,3,3], //26
+              [3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3], //27
+              [3,1,0,1,2,1,0,0,0,0,0,2,1,1,1,1,2,3,0,0,0,0,0,0,0,0,0,0,0,0,0,3], //28
+              [3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3], //29
+              [3,0,0,0,1,0,0,1,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3], //30
+              [3,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,1,1,1,0,0,0,0,0,0,0,0,3], //31
+              [3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,0,0,0,0,0,0,0,3], //32
+];
 
 function main() {
     textNum = 0;
@@ -87,8 +121,8 @@ function main() {
     u_Color = gl.getUniformLocation(gl.program, 'u_Color');
 
     mvpMatrix = new Matrix4();
-    mvpMatrix.setPerspective(30, 1, 1, 100);
-    eyeObj = {"x": 10, "y": 2, "z": 10, "lookX": 0, "lookY": 2, "lookZ": 0};
+    mvpMatrix.setPerspective(90, 1, 1, 100);
+    eyeObj = {"x": 10, "y": 2, "z": 10, "lookX": 5, "lookY": 2, "lookZ": 5};
     mvpMatrix.lookAt(eyeObj.x, eyeObj.y, eyeObj.z, eyeObj.lookX, eyeObj.lookY, eyeObj.lookZ, 0, 1, 0);
 
     // Pass the model view projection matrix to u_MvpMatrix
@@ -105,20 +139,42 @@ function main() {
 }
 
 function draw(n) {
+    console.log(eyeObj);
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
     mvpMatrix = new Matrix4();
-    mvpMatrix.setPerspective(30, 1, 1, 100);
+    mvpMatrix.setPerspective(90, 1, 1, 100);
     mvpMatrix.lookAt(eyeObj.x, eyeObj.y, eyeObj.z, eyeObj.lookX, eyeObj.lookY, eyeObj.lookZ, 0, 1, 0);
     gl.uniformMatrix4fv(u_MvpMatrix, false, mvpMatrix.elements);
 
-    for (let len = 0; len < array.length; len++) {
-        for (let width = 0; width < array[len].length; width++) {
-            if (array[len][width] === 1) {
-                drawCube({"x": len, "y": 0, "z": width}, u_MvpMatrix, mvpMatrix, {
-                    "x": 1,
-                    "y": 1,
-                    "z": 1
-                }, n, {"type": 1, "texID": 2})
+    drawCube({"x":0,"y":0,"z":0},u_MvpMatrix,mvpMatrix,{"x":32,"y":0,"z":32},n,
+        {"type":0,"rgb":{"red":0,"green":60,"blue":0}});
+    drawCube({"x":0,"y":-2,"z":0},u_MvpMatrix,mvpMatrix,{"x":64,"y":32,"z":64},n,
+        {"type":1,"texID":1});
+    for (let len = 0; len < bigArr.length; len++) {
+        for (let width = 0; width < bigArr[len].length; width++) {
+            switch (bigArr[len][width]) {
+                case 3:
+                    drawCube({"x": len, "y": 2, "z": width},
+                        u_MvpMatrix,
+                        mvpMatrix,
+                        {"x": 1, "y": 1, "z": 1},
+                        n,
+                        {"type": 1, "texID": 2});
+                case 2:
+                    drawCube({"x": len, "y": 1, "z": width},
+                        u_MvpMatrix,
+                        mvpMatrix,
+                        {"x": 1, "y": 1, "z": 1},
+                        n,
+                        {"type": 1, "texID": 2});
+                case 1:
+                    drawCube({"x": len, "y": 0, "z": width},
+                        u_MvpMatrix,
+                        mvpMatrix,
+                        {"x": 1, "y": 1, "z": 1},
+                        n,
+                        {"type": 1, "texID": 2});
+                    break;
             }
         }
     }
@@ -297,38 +353,32 @@ function loadTexture(gl, n, texture, u_Sampler, image, texID) {
             keydown(ev, gl, n,);
         };
         draw(n);
-        // gl.clear(gl.COLOR_BUFFER_BIT|gl.DEPTH_BUFFER_BIT);
-        // drawCube(
-        //     {"x": 0, "y": 0, "z": 1},
-        //     u_MvpMatrix,
-        //     mvpMatrix,
-        //     {"x": 1, "y": 1, "z": 1},
-        //           n,
-        //     {"type":0,"rgb":{"red":0.5,"green":0.5,"blue":0.5}});
-        // drawCube({"x": 1, "y": 0, "z": 0}, u_MvpMatrix, mvpMatrix,
-        //     {"x": 1, "y": 1, "z": 1},
-        //     n,
-        //     {"type":1,"texID":1});
     }
 }
 
 function keydown(ev, gl, n) {
     switch (ev.which) {
         case 87: // W
-            console.log("KeyW");
+            // console.log("KeyW");
             moveForward();
             break;
         case 83: // S
-            console.log("KeyS");
+            // console.log("KeyS");
             moveBackward();
             break;
         case 65: // A
-            console.log("KeyA");
+            // console.log("KeyA");
             moveLeft();
             break;
         case 68: // D
-            console.log("KeyD");
+            // console.log("KeyD");
             moveRight();
+            break;
+        case 69: // E
+            rotateRight();
+            break;
+        case 81: // Q
+            rotateLeft();
             break;
     }
     draw(n);
@@ -339,7 +389,7 @@ function moveForward() {
     let at = new Vector3([eyeObj.lookX, eyeObj.lookY, eyeObj.lookZ]);
     let eye = new Vector3([eyeObj.x, eyeObj.y, eyeObj.z]);
     let dir = at.sub(eye);
-    let sdir = dir.mul(G_STEP);
+    let sdir = dir.mul(G_STEP/2);
     let nEye = eye.add(sdir);
     let nAt = at.add(sdir);
     eyeObj.x = nEye.elements[0];
@@ -357,7 +407,7 @@ function moveBackward() {
     let at = new Vector3([eyeObj.lookX, eyeObj.lookY, eyeObj.lookZ]);
     let eye = new Vector3([eyeObj.x, eyeObj.y, eyeObj.z]);
     let dir = at.sub(eye);
-    let sdir = dir.mul(G_STEP);
+    let sdir = dir.mul(G_STEP/2);
     let nEye = eye.sub(sdir);
     let nAt = at.sub(sdir);
     eyeObj.x = nEye.elements[0];
@@ -394,6 +444,28 @@ function moveLeft() {
     eyeObj.z = eyeObj.z + deltaZ;
     eyeObj.lookX = eyeObj.lookX - deltaX;
     eyeObj.lookZ = eyeObj.lookZ + deltaZ;
+}
+
+function rotateRight(){
+    let at = new Vector3([eyeObj.lookX, eyeObj.lookY, eyeObj.lookZ]);
+    let eye = new Vector3([eyeObj.x, eyeObj.y, eyeObj.z]);
+    let dir = at.sub(eye);
+    dir.normalize();
+    let dX = Math.cos(G_ANGLE)*dir.elements[0] - Math.sin(G_ANGLE)*dir.elements[2];
+    let dZ = Math.sin(G_ANGLE)*dir.elements[0] + Math.cos(G_ANGLE)*dir.elements[2];
+    console.log(dX  + " " + dZ);
+    eyeObj.lookX +=dX;
+    eyeObj.lookZ +=dZ;
+}
+function rotateLeft() {
+    let at = new Vector3([eyeObj.lookX, eyeObj.lookY, eyeObj.lookZ]);
+    let eye = new Vector3([eyeObj.x, eyeObj.y, eyeObj.z]);
+    let dir = at.sub(eye);
+    dir.normalize();
+    let dX = Math.cos(G_ANGLE)*dir.elements[0] - Math.sin(G_ANGLE)*dir.elements[2];
+    let dZ = Math.sin(G_ANGLE)*dir.elements[0] + Math.cos(G_ANGLE)*dir.elements[2];
+    eyeObj.lookX -=dX;
+    eyeObj.lookZ -=dZ;
 }
 
 
