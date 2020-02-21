@@ -39,14 +39,16 @@ let u_Text;
 let u_Color;
 let eyeObj = {};
 const G_STEP = .1;
-const G_ANGLE = 1;
+const G_ANGLE = .5;
 
 let array = [[1, 0, 0, 2],
              [3, 2, 0, 1],
              [1, 0, 0, 1],
              [1, 1, 1, 1]];
+let n;
 
-let bigArr = [[0,0,0,0,0,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3], //1
+//map of cubes with heights
+let bigArr = [[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3], //1
               [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3], //2
               [0,1,0,1,2,1,0,0,0,0,0,2,1,1,1,1,2,3,0,0,0,0,0,0,0,0,0,0,0,0,0,3], //3
               [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3], //4
@@ -54,12 +56,12 @@ let bigArr = [[0,0,0,0,0,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3],
               [3,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,1,1,1,0,0,0,0,0,0,0,0,3], //6
               [3,1,1,1,0,0,2,2,2,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3], //7
               [3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3], //8
-              [3,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,2,2,3,3,3,3,3,3,3,3,3,3,3,3], //9
+              [3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3], //9
               [3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3], //11
               [3,1,0,1,2,1,0,0,0,0,0,2,1,1,1,1,2,3,0,0,0,0,0,0,0,0,0,0,0,0,0,3], //12
               [3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3], //13
               [3,0,0,0,1,0,0,1,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3], //14
-              [3,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,1,1,1,0,0,0,0,0,0,0,0,3], //15
+              [3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3], //15
               [3,1,1,1,0,0,2,2,2,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3], //16
               [3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3], //17
               [3,2,2,2,2,1,1,2,1,2,1,0,0,0,0,0,0,0,0,1,3,3,3,3,3,3,3,3,3,3,3,3], //18
@@ -67,7 +69,7 @@ let bigArr = [[0,0,0,0,0,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3],
               [3,1,0,1,2,1,0,0,0,0,0,2,1,1,1,1,2,3,0,0,0,0,0,0,0,0,0,0,0,0,0,3], //20
               [3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,0,0,3], //21
               [3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3], //22
-              [3,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,1,1,1,0,0,0,0,0,0,0,0,3], //23
+              [3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3], //23
               [3,1,1,1,0,0,2,2,2,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3], //24
               [3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3], //25
               [3,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,2,2,3,3,3,3,3,3,3,3,3,3,3,3], //26
@@ -98,7 +100,7 @@ function main() {
     }
 
     // Set the vertex information
-    var n = initVertexBuffers(gl);
+     n = initVertexBuffers(gl);
     if (n < 0) {
         console.log('Failed to set the vertex information');
         return;
@@ -138,13 +140,30 @@ function main() {
     // Draw the cube
 }
 
+function drawAxis(n) {
+    drawCube({"x":0,"y":0,"z":0},u_MvpMatrix,mvpMatrix,{"x":.1,"y":32,"z":.1},n,
+        {"type":0,"rgb":{"red":255,"green":0,"blue":0}});
+    drawCube({"x":0,"y":0,"z":0},u_MvpMatrix,mvpMatrix,{"x":32,"y":.1,"z":.1},n,
+        {"type":0,"rgb":{"red":0,"green":0,"blue":0}});
+    drawCube({"x":0,"y":0,"z":0},u_MvpMatrix,mvpMatrix,{"x":.1,"y":.1,"z":32},n,
+        {"type":0,"rgb":{"red":0,"green":0,"blue":255}});
+}
 function draw(n) {
-    console.log(eyeObj);
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
     mvpMatrix = new Matrix4();
     mvpMatrix.setPerspective(90, 1, 1, 100);
     mvpMatrix.lookAt(eyeObj.x, eyeObj.y, eyeObj.z, eyeObj.lookX, eyeObj.lookY, eyeObj.lookZ, 0, 1, 0);
     gl.uniformMatrix4fv(u_MvpMatrix, false, mvpMatrix.elements);
+
+
+
+    console.log("EyeY: ", eyeObj.x, ", EyeZ: ", eyeObj.z, ", AtX: ", eyeObj.lookX, ", At.Z: ", eyeObj.lookZ);
+    let dirX = eyeObj.x - eyeObj.lookX;
+    let dirZ = eyeObj.z - eyeObj.lookZ;
+    let dirH = Math.sqrt(dirX**2 + dirZ**2);
+    console.log("DirH: ", dirH);
+
+    drawAxis(n);
 
     drawCube({"x":0,"y":0,"z":0},u_MvpMatrix,mvpMatrix,{"x":32,"y":0,"z":32},n,
         {"type":0,"rgb":{"red":0,"green":60,"blue":0}});
@@ -178,10 +197,14 @@ function draw(n) {
             }
         }
     }
+    console.log(nCubes);
+    nCubes = 0;
 }
 
+let nCubes = 0;
 
 function drawCube(center, u_MvpMatrix, mvpMatrix, scale, n, color) {
+    nCubes ++;
     gl.uniform1i(u_Text, color.type);
     if (color.type === 0) {
         gl.uniform4fv(u_Color, new Float32Array([color.rgb.red, color.rgb.green, color.rgb.blue, 1.0]));
@@ -345,8 +368,6 @@ function loadTexture(gl, n, texture, u_Sampler, image, texID) {
     gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB, gl.RGB, gl.UNSIGNED_BYTE, image);
 
     // Set the texture unit 0 to the sampler
-
-
     // gl.drawElements(gl.TRIANGLES, n, gl.UNSIGNED_BYTE, 0);
     if (textNum === 3) {
         document.onkeydown = function (ev) {
@@ -399,7 +420,7 @@ function moveForward() {
     eyeObj.lookX = nAt.elements[0];
     eyeObj.lookY = nAt.elements[1];
     eyeObj.lookZ = nAt.elements[2];
-    console.log(eyeObj);
+    // console.log(eyeObj);
 
 }
 
@@ -417,7 +438,7 @@ function moveBackward() {
     eyeObj.lookX = nAt.elements[0];
     eyeObj.lookY = nAt.elements[1];
     eyeObj.lookZ = nAt.elements[2];
-    console.log(eyeObj);
+    // console.log(eyeObj);
 }
 
 function getDeltasLR() {
@@ -446,26 +467,110 @@ function moveLeft() {
     eyeObj.lookZ = eyeObj.lookZ + deltaZ;
 }
 
+// function rotateRight(){
+//     console.log(G_ANGLE);
+//
+//     let at = new Vector3([eyeObj.lookX, eyeObj.lookY, eyeObj.lookZ]);
+//     let eye = new Vector3([eyeObj.x, eyeObj.y, eyeObj.z]);
+//     let dir = eye.sub(at);
+//     let dX = Math.cos(G_ANGLE)*dir.elements[0] - Math.sin(G_ANGLE)*dir.elements[2];
+//     let dZ = Math.sin(G_ANGLE)*dir.elements[0] + Math.cos(G_ANGLE)*dir.elements[2];
+//     eyeObj.lookX = eyeObj.x - dX;
+//     eyeObj.lookZ = eyeObj.z - dZ;
+// }
+// function rotateLeft() {
+//     console.log(G_ANGLE);
+//     let at = new Vector3([eyeObj.lookX, eyeObj.lookY, eyeObj.lookZ]);
+//     let eye = new Vector3([eyeObj.x, eyeObj.y, eyeObj.z]);
+//     let dir = eye.sub(at);
+//     let dX = Math.cos(G_ANGLE)*dir.elements[0] - Math.sin(G_ANGLE)*dir.elements[2];
+//     let dZ = Math.sin(G_ANGLE)*dir.elements[0] + Math.cos(G_ANGLE)*dir.elements[2];
+//     eyeObj.lookX = eyeObj.x + dX;
+//     eyeObj.lookZ = eyeObj.z + dZ;
+// }
+
 function rotateRight(){
     let at = new Vector3([eyeObj.lookX, eyeObj.lookY, eyeObj.lookZ]);
+    console.log("at: ", at);
     let eye = new Vector3([eyeObj.x, eyeObj.y, eyeObj.z]);
-    let dir = at.sub(eye);
-    dir.normalize();
-    let dX = Math.cos(G_ANGLE)*dir.elements[0] - Math.sin(G_ANGLE)*dir.elements[2];
-    let dZ = Math.sin(G_ANGLE)*dir.elements[0] + Math.cos(G_ANGLE)*dir.elements[2];
-    console.log(dX  + " " + dZ);
-    eyeObj.lookX +=dX;
-    eyeObj.lookZ +=dZ;
+    console.log("eye: ", eye);
+    let dir = eye.sub(at);
+    console.log("dir: ", dir);
+    console.log("normalized dir: ", dir);
+    let sin = Math.sin(G_ANGLE);
+    let cos = Math.cos(G_ANGLE);
+    console.log("sin: ", sin  + ", cos: " + cos);
+
+    let dX = cos*dir.elements[0] -sin*dir.elements[2];
+    let dZ = sin*dir.elements[0] + cos*dir.elements[2];
+    console.log("dX: ", dX  + ", dZ: " + dZ);
+    eyeObj.lookX = eyeObj.x - dX;
+    eyeObj.lookZ = eyeObj.z - dZ;
 }
 function rotateLeft() {
     let at = new Vector3([eyeObj.lookX, eyeObj.lookY, eyeObj.lookZ]);
     let eye = new Vector3([eyeObj.x, eyeObj.y, eyeObj.z]);
-    let dir = at.sub(eye);
-    dir.normalize();
-    let dX = Math.cos(G_ANGLE)*dir.elements[0] - Math.sin(G_ANGLE)*dir.elements[2];
-    let dZ = Math.sin(G_ANGLE)*dir.elements[0] + Math.cos(G_ANGLE)*dir.elements[2];
-    eyeObj.lookX -=dX;
-    eyeObj.lookZ -=dZ;
+    let dir = eye.sub(at);
+    console.log("dir: ", dir);
+    console.log("normalized dir: ", dir);
+    let sin = Math.sin(G_ANGLE);
+    let cos = Math.cos(G_ANGLE);
+    let dX = cos*dir.elements[0] - sin*dir.elements[2];
+    let dZ = sin*dir.elements[0] +cos*dir.elements[2];
+    console.log("dX: ", dX  + ", dZ: " + dZ);
+    eyeObj.lookX = eyeObj.x + dX;
+    eyeObj.lookZ = eyeObj.z + dZ;
 }
+
+// function turnRight() {
+//     let dirX = eyeObj.x - eyeObj.lookX;
+//     let dirZ = eyeObj.z - eyeObj.lookZ;
+//     let dirH = Math.sqrt(dirX**2 + dirZ**2);
+//
+//     let alpha;
+//     if (dirX >= 0 && dirZ >= 0) {
+//         alpha = Math.asin(dirZ / dirH ) + G_ANGLE;
+//         eyeObj.lookX = eyeObj.x - dirH * Math.cos(alpha);
+//         eyeObj.lookZ = eyeObj.z - dirH * Math.sin(alpha);
+//     } else if (dirX < 0 && dirZ >= 0) {
+//         alpha = Math.asin((-dirX) / dirH ) + G_ANGLE;
+//         eyeObj.lookX = eyeObj.x + dirH * Math.sin(alpha);
+//         eyeObj.lookZ = eyeObj.z - dirH * Math.cos(alpha);
+//     } else if (dirX < 0 && dirZ < 0) {
+//         alpha = Math.asin((-dirZ) / dirH ) + G_ANGLE;
+//         eyeObj.lookX = eyeObj.x + dirH * Math.cos(alpha);
+//         eyeObj.lookZ = eyeObj.z + dirH * Math.sin(alpha);
+//     } else {
+//         alpha = Math.asin(dirX / dirH ) + G_ANGLE;
+//         eyeObj.lookX = eyeObj.x - dirH * Math.sin(alpha);
+//         eyeObj.lookZ = eyeObj.z + dirH * Math.cos(alpha);
+//     }
+// }
+//
+// function turnLeft() {
+//     let dirX = eyeObj.x - eyeObj.lookX;
+//     let dirZ = eyeObj.z - eyeObj.lookZ;
+//     let dirH = Math.sqrt(dirX**2 + dirZ**2);
+//
+//     let alpha;
+//     if (dirX >= 0 && dirZ >= 0) {
+//         alpha = Math.asin(dirX / dirH ) + G_ANGLE;
+//         eyeObj.lookX = eyeObj.x - dirH * Math.sin(alpha);
+//         eyeObj.lookZ = eyeObj.z - dirH * Math.cos(alpha);
+//     } else if (dirX >= 0 && dirZ < 0) {
+//         alpha = Math.asin((-dirZ) / dirH ) + G_ANGLE;
+//         eyeObj.lookX = eyeObj.x - dirH * Math.cos(alpha);
+//         eyeObj.lookZ = eyeObj.z + dirH * Math.sin(alpha);
+//     } else if (dirX < 0 && dirZ <= 0) {
+//         alpha = Math.asin((-dirX) / dirH ) + G_ANGLE;
+//         eyeObj.lookX = eyeObj.x + dirH * Math.sin(alpha);
+//         eyeObj.lookZ = eyeObj.z + dirH * Math.cos(alpha);
+//     } else {
+//         alpha = Math.asin(dirZ / dirH ) + G_ANGLE;
+//         eyeObj.lookX = eyeObj.x + dirH * Math.cos(alpha);
+//         eyeObj.lookZ = eyeObj.z - dirH * Math.sin(alpha);
+//     }
+// }
+
 
 
