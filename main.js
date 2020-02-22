@@ -163,6 +163,8 @@ function draw(n) {
         {"type":0,"rgb":{"red":0,"green":.60,"blue":0}});
     drawCube({"x":0,"y":-2,"z":0},u_MvpMatrix,mvpMatrix,{"x":64,"y":32,"z":64},n,
         {"type":1,"texID":1});
+    drawCube({"x":0,"y":30,"z":0},u_MvpMatrix,mvpMatrix,{"x":64,"y":-1,"z":64},n,
+        {"type":1,"texID":6});
 
     for (let len = 0; len < bigArr.length; len++) {
         for (let width = 0; width < bigArr[len].length; width++) {
@@ -444,7 +446,8 @@ function initTextures(gl, n) {
         'resources/stone.jpg',
         'resources/bark.jpg',
         'resources/leaf.jpg',
-        'resources/brick.png'];
+        'resources/brick.png',
+        'resources/sky-2.jpg'];
     let texArr = [gl.TEXTURE0, gl.TEXTURE1, gl.TEXTURE2, gl.TEXTURE3, gl.TEXTURE4, gl.TEXTURE5, gl.TEXTURE6, gl.TEXTURE7];
 
     u_Sampler = gl.getUniformLocation(gl.program, 'u_Sampler');
@@ -490,7 +493,7 @@ function loadTexture(gl, n, texture, u_Sampler, image, texID) {
 
     // Set the texture unit 0 to the sampler
     // gl.drawElements(gl.TRIANGLES, n, gl.UNSIGNED_BYTE, 0);
-    if (textNum === 6) {
+    if (textNum === 7) {
         document.onkeydown = function (ev) {
             keydown(ev, gl, n,);
         };
