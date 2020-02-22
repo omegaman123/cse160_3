@@ -40,7 +40,10 @@ let u_Color;
 let eyeObj = {};
 const G_STEP = .1;
 const G_ANGLE = .2;
-let animal = [];
+let ANGLE_STEP = 45.0;
+let g_ANGLE_STEP = ANGLE_STEP;
+let cAngle;
+let canvas;
 
 
 let array = [[1, 0, 0, 2],
@@ -58,7 +61,7 @@ let bigArr = [[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3],
               [3,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,1,1,1,0,0,0,0,0,99,0,0,3], //6
               [3,1,1,1,0,0,2,2,2,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3], //7
               [3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3], //8
-              [3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3], //9
+              [3,0,0,0,0,0,0,0,0,0,0,0,75,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3], //9
               [3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3], //11
               [3,1,0,1,2,1,0,0,0,0,0,5,4,4,4,4,5,6,0,0,0,0,0,0,0,0,0,0,0,0,0,3], //12
               [3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3], //13
@@ -86,7 +89,7 @@ let bigArr = [[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3],
 function main() {
     textNum = 0;
     // Retrieve <canvas> element
-    var canvas = document.getElementById('webgl');
+     canvas = document.getElementById('webgl');
 
     // Get the rendering context for WebGL
     gl = getWebGLContext(canvas);
@@ -141,6 +144,25 @@ function main() {
     }
 }
 
+
+var g_last = Date.now();
+
+function animate(angle) {
+    // Calculate the elapsed time
+    var now = Date.now();
+    var elapsed = now - g_last;
+    g_last = now;
+    if (angle > 25) {
+        g_ANGLE_STEP = -ANGLE_STEP;
+    } else if (angle < -25) {
+        g_ANGLE_STEP = ANGLE_STEP;
+    }
+    // Update the current rotation angle (adjusted by the elapsed time)
+    var newAngle = angle + (g_ANGLE_STEP * elapsed) / 1000.0;
+    newAngle%= 360;
+    return newAngle;
+}
+
 function drawAxis(n) {
     drawCube({"x":0,"y":0,"z":0},u_MvpMatrix,mvpMatrix,{"x":.1,"y":32,"z":.1},n,
         {"type":0,"rgb":{"red":255,"green":0,"blue":0}});
@@ -157,7 +179,10 @@ function draw(n) {
     mvpMatrix.lookAt(eyeObj.x, eyeObj.y, eyeObj.z, eyeObj.lookX, eyeObj.lookY, eyeObj.lookZ, 0, 1, 0);
     gl.uniformMatrix4fv(u_MvpMatrix, false, mvpMatrix.elements);
 
+
+
     // drawAxis(n);
+
 
     drawCube({"x":0,"y":0,"z":0},u_MvpMatrix,mvpMatrix,{"x":64,"y":0,"z":64},n,
         {"type":0,"rgb":{"red":0,"green":.60,"blue":0}});
@@ -202,6 +227,9 @@ function draw(n) {
                         n,
                         {"type": 0, "rgb":{"red":.9,"green":.9,"blue":0}});
                     break;
+                case 75:
+                    drawAnimal({"x":len,"y":0,"z":width},n);
+                    break;
                 case 6:
                     drawCube({"x": len, "y": 2, "z": width},
                         u_MvpMatrix,
@@ -233,7 +261,7 @@ function draw(n) {
 
 let nCubes = 0;
 
-function drawCube(center, u_MvpMatrix, mvpMatrix, scale, n, color,anim) {
+function drawCube(center, u_MvpMatrix, mvpMatrix, scale, n, color) {
     nCubes ++;
         gl.uniform1i(u_Text, color.type);
         if (color.type === 0) {
@@ -347,6 +375,51 @@ function drawTree(center,n) {
 
 }
 
+function drawAnimalCube(center,u_MvpMatrix,mvpMatrix,angle,scale,n,color,anim) {
+    nCubes ++;
+    gl.uniform1i(u_Text, color.type);
+    if (color.type === 0) {
+        gl.uniform4fv(u_Color, new Float32Array([color.rgb.red, color.rgb.green, color.rgb.blue, 1.0]));
+
+    } else if (color.type === 1) {
+        gl.uniform1i(u_Sampler, color.texID);
+    }
+    let model = new Matrix4();
+
+    model.translate(center.x, center.y, center.z);
+    model.rotate(angle,0,0,1);
+    model.scale(scale.x, scale.y, scale.z);
+
+    let mvp = new Matrix4();
+    mvp.set(mvpMatrix);
+    // mvp.rotate(cAngle,0,1,0);
+    mvp.multiply(model);
+
+
+    // Pass the model view projection matrix to u_MvpMatrix
+    gl.uniformMatrix4fv(u_MvpMatrix, false, mvp.elements);
+    // Clear color and depth buffer
+
+    // Draw the cube
+    gl.drawElements(gl.TRIANGLES, n, gl.UNSIGNED_BYTE, 0);
+}
+
+function drawAnimal(center,n) {
+    drawAnimalCube({"x":center.x,"y":center.y+.5,"z":center.z},u_MvpMatrix,mvpMatrix, 0,{"x":1.5,"y":.5,"z":1},n, //body
+        {"type":0,"rgb":{"red":0,"green":0,"blue":1}},{});
+    drawAnimalCube({"x":center.x,"y":center.y,"z":center.z},u_MvpMatrix,mvpMatrix, 0,{"x":.25,"y":.5,"z":.25},n,
+        {"type":0,"rgb":{"red":1,"green":0,"blue":0}},{});
+    drawAnimalCube({"x":center.x+1.25,"y":center.y,"z":center.z},u_MvpMatrix,mvpMatrix, 0,{"x":.25,"y":.5,"z":.25},n,
+        {"type":0,"rgb":{"red":1,"green":0,"blue":0}},{});
+    drawAnimalCube({"x":center.x,"y":center.y,"z":center.z+.75},u_MvpMatrix,mvpMatrix, 0,{"x":.25,"y":.5,"z":.25},n,
+        {"type":0,"rgb":{"red":1,"green":0,"blue":0}},{});
+    drawAnimalCube({"x":center.x+1.25,"y":center.y,"z":center.z+.75},u_MvpMatrix,mvpMatrix, 0,{"x":.25,"y":.5,"z":.25},n,
+        {"type":0,"rgb":{"red":1,"green":0,"blue":0}},{});
+    drawAnimalCube({"x":center.x+.1,"y":center.y+.5,"z":center.z+.25},u_MvpMatrix,mvpMatrix, 45,{"x":.5,"y":.75,"z":.5},n,
+        {"type":0,"rgb":{"red":1,"green":0,"blue":1}},{});
+    drawAnimalCube({"x":center.x-.5,"y":center.y+1,"z":center.z+.175},u_MvpMatrix,mvpMatrix, 0,{"x":.6,"y":.45,"z":.6},n,
+        {"type":0,"rgb":{"red":0,"green":1,"blue":1}},{});
+}
 
 function initVertexBuffers(gl) {
     // Create a cube
@@ -497,7 +570,14 @@ function loadTexture(gl, n, texture, u_Sampler, image, texID) {
         document.onkeydown = function (ev) {
             keydown(ev, gl, n,);
         };
+        // var tick = function(){
+        //     cAngle = animate(cAngle);
+        //     drawAnimal({"x":8,"y":0,"z":13},n);
+        //     requestAnimationFrame(tick,canvas);
+        // };
         draw(n);
+        // tick();
+
     }
 }
 
@@ -598,13 +678,11 @@ function rotateRight(){
     let eye = new Vector3([eyeObj.x, eyeObj.y, eyeObj.z]);
     console.log("eye: ", eye);
     let dir = eye.sub(at);
-    console.log("dir: ", dir);
-    console.log("normalized dir: ", dir);
     let sin = Math.sin(G_ANGLE);
     let cos = Math.cos(G_ANGLE);
     console.log("sin: ", sin  + ", cos: " + cos);
 
-    let dX = cos*dir.elements[0] -sin*dir.elements[2];
+    let dX = cos*dir.elements[0] - sin*dir.elements[2];
     let dZ = sin*dir.elements[0] + cos*dir.elements[2];
     console.log("dX: ", dX  + ", dZ: " + dZ);
     eyeObj.lookX = eyeObj.x - dX;
