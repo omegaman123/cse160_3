@@ -5,11 +5,10 @@ var VSHADER_SOURCE =
     'attribute vec4 a_Color;\n' +
     'attribute vec2 a_TexCoord;\n' +
     'uniform mat4 u_MvpMatrix;\n' +
-    'uniform mat4 u_Model;\n' +
     'varying vec4 v_Color;\n' +
     'varying vec2 v_TexCoord;\n' +
     'void main() {\n' +
-    '  gl_Position = u_MvpMatrix * u_Model * a_Position;\n' +
+    '  gl_Position = u_MvpMatrix * a_Position;\n' +
     '  v_Color = a_Color;\n' +
     '  v_TexCoord = a_TexCoord;\n' +
     '}\n';
@@ -34,7 +33,6 @@ var FSHADER_SOURCE =
 let gl;
 let mvpMatrix;
 let u_MvpMatrix;
-let u_Model;
 let textNum;
 let u_Sampler;
 let u_Text;
@@ -44,15 +42,9 @@ const G_STEP = .1;
 const G_ANGLE = .2;
 let ANGLE_STEP = 45.0;
 let g_ANGLE_STEP = ANGLE_STEP;
-let cAngle = 0;
+let cAngle;
 let canvas;
-let model;
-// let mvpMatrix;
-let nCubes = 0;
-let nScale = 0;
-let lastTexID;
-let lastColorType;
-let anim = {"x":1,"y":0,"z":0,"angle":0,"circleAngle":.1,"radius":2,"nX":0,"nZ":0};
+
 
 let array = [[1, 0, 0, 2],
              [3, 2, 0, 1],
@@ -68,13 +60,13 @@ let bigArr = [[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3],
               [0,0,0,0,99,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3], //5
               [3,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,1,1,1,0,0,0,0,0,99,0,0,3], //6
               [3,1,1,1,0,0,2,2,2,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3], //7
-              [3,0,0,0,0,0,0,0,0,0,0,0,75,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3], //8
+              [3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3], //8
               [3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3], //9
               [3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3], //11
               [3,1,0,1,2,1,0,0,0,0,0,5,4,4,4,4,5,6,0,0,0,0,0,0,0,0,0,0,0,0,0,3], //12
               [3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3], //13
               [3,0,0,0,4,0,0,4,0,0,0,0,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3], //14
-              [3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,99,0,0,0,0,0,0,0,0,3], //15
+              [3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,75,0,0,0,0,0,99,0,0,0,0,0,0,0,0,3], //15
               [3,1,1,1,0,0,2,2,2,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3], //16
               [3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3], //17
               [3,2,2,2,2,1,1,2,1,2,1,0,0,0,0,0,0,0,0,1,3,3,3,3,3,3,3,3,3,3,3,3], //18
@@ -88,9 +80,9 @@ let bigArr = [[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3],
               [3,0,0,0,0,0,0,0,0,0,0,0,0,4,4,4,4,4,5,5,6,6,6,6,6,6,6,6,6,6,6,3], //26
               [3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3], //27
               [3,1,0,1,2,1,0,0,0,0,0,2,1,1,1,1,2,3,0,0,0,0,0,0,0,0,0,0,0,0,0,3], //28
-              [3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,75,0,0,0,0,99,0,3], //29
+              [3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,99,0,3], //29
               [3,0,0,0,1,0,0,1,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3], //30
-              [3,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,1,1,1,0,0,0,0,0,0,0,0,3], //31
+              [3,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,1,1,1,0,0,0,0,0,75,0,0,3], //31
               [3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,50,0,0,0,0,0,0,0,3], //32
 ];
 
@@ -100,7 +92,7 @@ function main() {
      canvas = document.getElementById('webgl');
 
     // Get the rendering context for WebGL
-    gl = getWebGLContext(canvas, false);
+    gl = getWebGLContext(canvas);
     if (!gl) {
         console.log('Failed to get the rendering context for WebGL');
         return;
@@ -130,13 +122,6 @@ function main() {
         return;
     }
 
-    // Get the storage location of u_Model
-    u_Model = gl.getUniformLocation(gl.program, 'u_Model');
-    if (!u_MvpMatrix) {
-        console.log('Failed to get the storage location of u_Model');
-        return;
-    }
-
     u_Text = gl.getUniformLocation(gl.program, 'u_Text');
     gl.uniform1i(u_Text, 1);
 
@@ -157,7 +142,6 @@ function main() {
         console.log('Failed to intialize the texture.');
         return;
     }
-    model = new Matrix4();
 }
 
 
@@ -176,9 +160,6 @@ function animate(angle) {
     // Update the current rotation angle (adjusted by the elapsed time)
     var newAngle = angle + (g_ANGLE_STEP * elapsed) / 1000.0;
     newAngle%= 360;
-    var animalAngle = angle + (10 * elapsed) / 1000.0;
-    anim.nZ = Math.cos(animalAngle/100) * anim.radius;
-    anim.nX = Math.sin(animalAngle/100) * anim.radius;
     return newAngle;
 }
 
@@ -190,22 +171,24 @@ function drawAxis(n) {
     drawCube({"x":0,"y":0,"z":0},u_MvpMatrix,mvpMatrix,{"x":.1,"y":.1,"z":32},n,
         {"type":0,"rgb":{"red":0,"green":0,"blue":255}});
 }
-
 function draw(n) {
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+    gl.enable(gl.DEPTH_TEST);
+    mvpMatrix = new Matrix4();
     mvpMatrix.setPerspective(90, 1, 1, 100);
     mvpMatrix.lookAt(eyeObj.x, eyeObj.y, eyeObj.z, eyeObj.lookX, eyeObj.lookY, eyeObj.lookZ, 0, 1, 0);
     gl.uniformMatrix4fv(u_MvpMatrix, false, mvpMatrix.elements);
 
+
+
     // drawAxis(n);
 
-    lastTexID = 0;
-    lastColorType = -1;
-    drawCube({"x":0,"y":0,"z":0},{"x":64,"y":0,"z":64},n,
+
+    drawCube({"x":0,"y":0,"z":0},u_MvpMatrix,mvpMatrix,{"x":64,"y":0,"z":64},n,
         {"type":0,"rgb":{"red":0,"green":.60,"blue":0}});
-    drawCube({"x":0,"y":-2,"z":0},{"x":64,"y":32,"z":64},n,
+    drawCube({"x":0,"y":-2,"z":0},u_MvpMatrix,mvpMatrix,{"x":64,"y":32,"z":64},n,
         {"type":1,"texID":1});
-    drawCube({"x":0,"y":30,"z":0},{"x":64,"y":-1,"z":64},n,
+    drawCube({"x":0,"y":30,"z":0},u_MvpMatrix,mvpMatrix,{"x":64,"y":-1,"z":64},n,
         {"type":1,"texID":6});
 
     for (let len = 0; len < bigArr.length; len++) {
@@ -213,16 +196,22 @@ function draw(n) {
             switch (bigArr[len][width]) {
                 case 3:
                     drawCube({"x": len, "y": 2, "z": width},
+                        u_MvpMatrix,
+                        mvpMatrix,
                         {"x": 1, "y": 1, "z": 1},
                         n,
                         {"type": 1, "texID": 2});
                 case 2:
                     drawCube({"x": len, "y": 1, "z": width},
+                        u_MvpMatrix,
+                        mvpMatrix,
                         {"x": 1, "y": 1, "z": 1},
                         n,
                         {"type": 1, "texID": 2});
                 case 1:
                     drawCube({"x": len, "y": 0, "z": width},
+                        u_MvpMatrix,
+                        mvpMatrix,
                         {"x": 1, "y": 1, "z": 1},
                         n,
                         {"type": 1, "texID": 2});
@@ -231,26 +220,34 @@ function draw(n) {
                     drawTree({"x":len,"y":0,"z":width},n);
                     break;
                 case 50:
-                    drawCube({"x": len, "y": 3, "z": width},
+                    drawCube({"x": len, "y": 0, "z": width},
+                        u_MvpMatrix,
+                        mvpMatrix,
                         {"x": 1, "y": 20, "z": 1},
                         n,
                         {"type": 0, "rgb":{"red":.9,"green":.9,"blue":0}});
                     break;
                 case 75:
-                    drawAnimal({"x":len + anim.nX,"y":0,"z":width+anim.nZ},n);
+                    drawAnimal({"x":len,"y":0,"z":width},n);
                     break;
                 case 6:
                     drawCube({"x": len, "y": 2, "z": width},
+                        u_MvpMatrix,
+                        mvpMatrix,
                         {"x": 1, "y": 1, "z": 1},
                         n,
                         {"type": 1, "texID": 5});
                 case 5:
                     drawCube({"x": len, "y": 1, "z": width},
+                        u_MvpMatrix,
+                        mvpMatrix,
                         {"x": 1, "y": 1, "z": 1},
                         n,
                         {"type": 1, "texID": 5});
                 case 4:
                     drawCube({"x": len, "y": 0, "z": width},
+                        u_MvpMatrix,
+                        mvpMatrix,
                         {"x": 1, "y": 1, "z": 1},
                         n,
                         {"type": 1, "texID": 5});
@@ -258,126 +255,149 @@ function draw(n) {
             }
         }
     }
-    console.log(nCubes, ", ", nScale);
+    console.log(nCubes);
     nCubes = 0;
-    nScale = 0;
 }
 
-function drawCube(center, scale, n, color) {
-    nCubes++;
-    if (lastColorType !== color.type) {
-        lastColorType = color.type;
+let nCubes = 0;
+
+function drawCube(center, u_MvpMatrix, mvpMatrix, scale, n, color) {
+    nCubes ++;
         gl.uniform1i(u_Text, color.type);
-    }
+        if (color.type === 0) {
+            gl.uniform4fv(u_Color, new Float32Array([color.rgb.red, color.rgb.green, color.rgb.blue, 1.0]));
 
-    if (color.type === 0) {
-        gl.uniform4fv(u_Color, new Float32Array([color.rgb.red, color.rgb.green, color.rgb.blue, 1.0]));
-    } else if (color.type === 1 && lastTexID !== color.texID) {
-        lastTexID = color.texID;
-        gl.uniform1i(u_Sampler, color.texID);
-    }
-
-    model.setTranslate(center.x, center.y, center.z);
-    if (scale.x != 1.0 || scale.y != 1.0 || scale.z != 1.0) {
-        nScale++;
+        } else if (color.type === 1) {
+            gl.uniform1i(u_Sampler, color.texID);
+        }
+        let model = new Matrix4();
+        model.translate(center.x, center.y, center.z);
         model.scale(scale.x, scale.y, scale.z);
-    }
-    // Pass the model view projection matrix to u_MvpMatrix
-    gl.uniformMatrix4fv(u_Model, false, model.elements);
 
-    // Draw the cube
-    gl.drawElements(gl.TRIANGLES, n, gl.UNSIGNED_BYTE, 0);
+        let mvp = new Matrix4();
+        mvp.set(mvpMatrix);
+        // mvp.rotate(cAngle,0,1,0);
+        mvp.multiply(model);
+
+
+        // Pass the model view projection matrix to u_MvpMatrix
+        gl.uniformMatrix4fv(u_MvpMatrix, false, mvp.elements);
+        // Clear color and depth buffer
+
+        // Draw the cube
+        gl.drawElements(gl.TRIANGLES, n, gl.UNSIGNED_BYTE, 0);
+
 }
 
 function drawTree(center,n) {
    drawCube({"x":center.x,"y":center.y,"z":center.z},
+       u_MvpMatrix,
+        mvpMatrix,
         {"x":1,"y":1,"z":1},
         n,
         {"type":1,"texID":3});
 
     drawCube({"x":center.x,"y":center.y+1,"z":center.z},
+        u_MvpMatrix,
+        mvpMatrix,
         {"x":1,"y":1,"z":1},
         n,
         {"type":1,"texID":3});
 
     drawCube({"x":center.x,"y":center.y+2,"z":center.z},
+        u_MvpMatrix,
+        mvpMatrix,
         {"x":1,"y":1,"z":1},
         n,
         {"type":1,"texID":3});
 
     drawCube({"x":center.x,"y":center.y+3,"z":center.z-1},
+        u_MvpMatrix,
+        mvpMatrix,
         {"x":1,"y":1,"z":1},
         n,
         {"type":1,"texID":4});
 
     drawCube({"x":center.x-1,"y":center.y+3,"z":center.z-1},
+        u_MvpMatrix,
+        mvpMatrix,
         {"x":1,"y":1,"z":1},
         n,
         {"type":1,"texID":4});
 
     drawCube({"x":center.x-1,"y":center.y+3,"z":center.z},
+        u_MvpMatrix,
+        mvpMatrix,
         {"x":1,"y":1,"z":1},
         n,
         {"type":1,"texID":4});
 
     drawCube({"x":center.x+1,"y":center.y+3,"z":center.z},
+        u_MvpMatrix,
+        mvpMatrix,
         {"x":1,"y":1,"z":1},
         n,
         {"type":1,"texID":4});
 
     drawCube({"x":center.x+1,"y":center.y+3,"z":center.z+1},
+        u_MvpMatrix,
+        mvpMatrix,
         {"x":1,"y":1,"z":1},
         n,
         {"type":1,"texID":4});
 
     drawCube({"x":center.x-1,"y":center.y+3,"z":center.z+1},
+        u_MvpMatrix,
+        mvpMatrix,
         {"x":1,"y":1,"z":1},
         n,
         {"type":1,"texID":4});
     drawCube({"x":center.x,"y":center.y+3,"z":center.z+1},
+        u_MvpMatrix,
+        mvpMatrix,
         {"x":1,"y":1,"z":1},
         n,
         {"type":1,"texID":4});
 
     drawCube({"x":center.x+1,"y":center.y+3,"z":center.z-1},
+        u_MvpMatrix,
+        mvpMatrix,
         {"x":1,"y":1,"z":1},
         n,
         {"type":1,"texID":4});
 
     drawCube({"x":center.x,"y":center.y+4,"z":center.z},
+        u_MvpMatrix,
+        mvpMatrix,
         {"x":1,"y":1,"z":1},
         n,
         {"type":1,"texID":4});
 
 }
 
-function drawAnimalCube(center, angle, scale, n, color, anim) {
+function drawAnimalCube(center,u_MvpMatrix,mvpMatrix,angle,scale,n,color,anim) {
     nCubes ++;
-    if (lastColorType !== color.type) {
-        lastColorType = color.type;
-        gl.uniform1i(u_Text, color.type);
-    }
+    gl.uniform1i(u_Text, color.type);
     if (color.type === 0) {
         gl.uniform4fv(u_Color, new Float32Array([color.rgb.red, color.rgb.green, color.rgb.blue, 1.0]));
 
     } else if (color.type === 1) {
         gl.uniform1i(u_Sampler, color.texID);
     }
+    let model = new Matrix4();
 
-    model.setTranslate(center.x, center.y, center.z);
-    if (angle > 0) {
-        model.rotate(angle,0,0,1);
-    }
-    if (anim.x !== 0 || anim.y !== 0 || anim.z !== 0){
-        model.rotate(anim.angle,anim.x,anim.y,anim.z);
-    }
-    if (scale.x != 1.0 || scale.y != 1.0 || scale.z != 1.0) {
-        nScale++;
-        model.scale(scale.x, scale.y, scale.z);
-    }
+    model.translate(center.x, center.y, center.z);
+    model.rotate(angle,0,0,1);
+    model.scale(scale.x, scale.y, scale.z);
+
+    let mvp = new Matrix4();
+    mvp.set(mvpMatrix);
+    // mvp.rotate(cAngle,0,1,0);
+    mvp.multiply(model);
+
 
     // Pass the model view projection matrix to u_MvpMatrix
-    gl.uniformMatrix4fv(u_Model, false, model.elements);
+    gl.uniformMatrix4fv(u_MvpMatrix, false, mvp.elements);
     // Clear color and depth buffer
 
     // Draw the cube
@@ -385,27 +405,20 @@ function drawAnimalCube(center, angle, scale, n, color, anim) {
 }
 
 function drawAnimal(center,n) {
-    drawAnimalCube({"x":center.x,"y":center.y+.5,"z":center.z}, 0,{"x":1.5,"y":.5,"z":1},n, //body
-        {"type":0,"rgb":{"red":0,"green":0,"blue":1}},{"x":0,"y":0,"z":0,"angle":0});
-
-    drawAnimalCube({"x":center.x+.25,"y":center.y+.5,"z":center.z}, 180,{"x":.25,"y":.5,"z":.25},n, //front left leg
-        {"type":0,"rgb":{"red":1,"green":0,"blue":0}},{"x":0,"y":0,"z":1,"angle":anim.angle});
-
-    drawAnimalCube({"x":center.x+1.25,"y":center.y+.5,"z":center.z}, 180,{"x":.25,"y":.5,"z":.25},n, //back left leg
-        {"type":0,"rgb":{"red":1,"green":0,"blue":0}},{"x":0,"y":0,"z":-1,"angle":anim.angle});
-
-    drawAnimalCube({"x":center.x+.25,"y":center.y+.5,"z":center.z+.75}, 180,{"x":.25,"y":.5,"z":.25},n, //front right leg
-        {"type":0,"rgb":{"red":1,"green":0,"blue":0}},{"x":0,"y":0,"z":-1,"angle":anim.angle});
-
-    drawAnimalCube({"x":center.x+1.25,"y":center.y+.5,"z":center.z+.75}, 180,{"x":.25,"y":.5,"z":.25},n, //back right leg
-        {"type":0,"rgb":{"red":1,"green":0,"blue":0}},{"x":0,"y":0,"z":1,"angle":anim.angle});
-
-    drawAnimalCube({"x":center.x,"y":center.y+.5,"z":center.z+.25}, 45,{"x":.5,"y":.75,"z":.5},n, //neck
-        {"type":0,"rgb":{"red":1,"green":0,"blue":1}},{"x":0,"y":0,"z":0,"angle":0});
-
-    drawAnimalCube({"x":center.x-.5,"y":center.y+1,"z":center.z+.175}, 0,{"x":.6,"y":.45,"z":.6},n, // head
-        {"type":0,"rgb":{"red":0,"green":1,"blue":1}},{"x":0,"y":0,"z":0,"angle":0});
-
+    drawAnimalCube({"x":center.x,"y":center.y+.5,"z":center.z},u_MvpMatrix,mvpMatrix, 0,{"x":1.5,"y":.5,"z":1},n, //body
+        {"type":0,"rgb":{"red":0,"green":0,"blue":1}},{});
+    drawAnimalCube({"x":center.x,"y":center.y,"z":center.z},u_MvpMatrix,mvpMatrix, 0,{"x":.25,"y":.5,"z":.25},n,
+        {"type":0,"rgb":{"red":1,"green":0,"blue":0}},{});
+    drawAnimalCube({"x":center.x+1.25,"y":center.y,"z":center.z},u_MvpMatrix,mvpMatrix, 0,{"x":.25,"y":.5,"z":.25},n,
+        {"type":0,"rgb":{"red":1,"green":0,"blue":0}},{});
+    drawAnimalCube({"x":center.x,"y":center.y,"z":center.z+.75},u_MvpMatrix,mvpMatrix, 0,{"x":.25,"y":.5,"z":.25},n,
+        {"type":0,"rgb":{"red":1,"green":0,"blue":0}},{});
+    drawAnimalCube({"x":center.x+1.25,"y":center.y,"z":center.z+.75},u_MvpMatrix,mvpMatrix, 0,{"x":.25,"y":.5,"z":.25},n,
+        {"type":0,"rgb":{"red":1,"green":0,"blue":0}},{});
+    drawAnimalCube({"x":center.x+.1,"y":center.y+.5,"z":center.z+.25},u_MvpMatrix,mvpMatrix, 45,{"x":.5,"y":.75,"z":.5},n,
+        {"type":0,"rgb":{"red":1,"green":0,"blue":1}},{});
+    drawAnimalCube({"x":center.x-.5,"y":center.y+1,"z":center.z+.175},u_MvpMatrix,mvpMatrix, 0,{"x":.6,"y":.45,"z":.6},n,
+        {"type":0,"rgb":{"red":0,"green":1,"blue":1}},{});
 }
 
 function initVertexBuffers(gl) {
@@ -557,13 +570,13 @@ function loadTexture(gl, n, texture, u_Sampler, image, texID) {
         document.onkeydown = function (ev) {
             keydown(ev, gl, n,);
         };
-        var tick = function(){
-            draw(n);
-            cAngle = animate(cAngle);
-            anim.angle = cAngle;
-            requestAnimationFrame(tick,canvas);
-        };
-        tick();
+        // var tick = function(){
+        //     cAngle = animate(cAngle);
+        //     drawAnimal({"x":8,"y":0,"z":13},n);
+        //     requestAnimationFrame(tick,canvas);
+        // };
+        draw(n);
+        // tick();
 
     }
 }
@@ -661,13 +674,17 @@ function moveLeft() {
 
 function rotateRight(){
     let at = new Vector3([eyeObj.lookX, eyeObj.lookY, eyeObj.lookZ]);
+    console.log("at: ", at);
     let eye = new Vector3([eyeObj.x, eyeObj.y, eyeObj.z]);
+    console.log("eye: ", eye);
     let dir = eye.sub(at);
     let sin = Math.sin(G_ANGLE);
     let cos = Math.cos(G_ANGLE);
+    console.log("sin: ", sin  + ", cos: " + cos);
 
     let dX = cos*dir.elements[0] - sin*dir.elements[2];
     let dZ = sin*dir.elements[0] + cos*dir.elements[2];
+    console.log("dX: ", dX  + ", dZ: " + dZ);
     eyeObj.lookX = eyeObj.x - dX;
     eyeObj.lookZ = eyeObj.z - dZ;
 }
@@ -675,10 +692,13 @@ function rotateLeft() {
     let at = new Vector3([eyeObj.lookX, eyeObj.lookY, eyeObj.lookZ]);
     let eye = new Vector3([eyeObj.x, eyeObj.y, eyeObj.z]);
     let dir = eye.sub(at);
+    console.log("dir: ", dir);
+    console.log("normalized dir: ", dir);
     let sin = Math.sin(-G_ANGLE);
     let cos = Math.cos(-G_ANGLE);
     let dX = cos*dir.elements[0] - sin*dir.elements[2];
     let dZ = sin*dir.elements[0] +cos*dir.elements[2];
+    console.log("dX: ", dX  + ", dZ: " + dZ);
     eyeObj.lookX = eyeObj.x - dX;
     eyeObj.lookZ = eyeObj.z - dZ;
 }
