@@ -52,7 +52,7 @@ let nCubes = 0;
 let nScale = 0;
 let lastTexID;
 let lastColorType;
-let anim = {"x":1,"y":0,"z":0,"angle":0,"circleAngle":.1,"radius":2,"nX":0,"nZ":0};
+let anim = {"x":1,"y":0,"z":0,"angle":0,"circleAngle":.1,"radius":1,"nX":0,"nZ":0,"gRotate":0};
 
 let array = [[1, 0, 0, 2],
              [3, 2, 0, 1],
@@ -68,10 +68,10 @@ let bigArr = [[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3],
               [0,0,0,0,99,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3], //5
               [3,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,1,1,1,0,0,0,0,0,99,0,0,3], //6
               [3,1,1,1,0,0,2,2,2,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3], //7
-              [3,0,0,0,0,0,0,0,0,0,0,0,75,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3], //8
+              [3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3], //8
               [3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3], //9
               [3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3], //11
-              [3,1,0,1,2,1,0,0,0,0,0,5,4,4,4,4,5,6,0,0,0,0,0,0,0,0,0,0,0,0,0,3], //12
+              [3,1,0,1,2,1,0,0,0,0,0,5,4,4,4,4,5,6,0,0,0,0,0,0,75,0,0,0,0,0,0,3], //12
               [3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3], //13
               [3,0,0,0,4,0,0,4,0,0,0,0,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3], //14
               [3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,99,0,0,0,0,0,0,0,0,3], //15
@@ -162,9 +162,12 @@ function main() {
 
 
 var g_last = Date.now();
-
+let moveCounter = 0;
+let currentTime = 0;
+let animalAngle = 0;
 function animate(angle) {
     // Calculate the elapsed time
+    moveCounter++;
     var now = Date.now();
     var elapsed = now - g_last;
     g_last = now;
@@ -176,9 +179,18 @@ function animate(angle) {
     // Update the current rotation angle (adjusted by the elapsed time)
     var newAngle = angle + (g_ANGLE_STEP * elapsed) / 1000.0;
     newAngle%= 360;
-    var animalAngle = angle + (10 * elapsed) / 1000.0;
-    anim.nZ = Math.cos(animalAngle/100) * anim.radius;
-    anim.nX = Math.sin(animalAngle/100) * anim.radius;
+        currentTime++;
+        animalAngle += .015;
+        animalAngle %= 360;
+        // console.log(animalAngle);
+        anim.nZ = Math.cos(animalAngle) * 1.5;
+        anim.nX = Math.sin(animalAngle) * 1.5;
+        anim.gRotate +=2;
+        anim.gRotate %=360;
+        // anim.nZ = Math.cos(anim.gRotate) * .5;
+        // anim.nX = Math.sin(anim.gRotate) * .5;
+
+
     return newAngle;
 }
 
@@ -237,7 +249,7 @@ function draw(n) {
                         {"type": 0, "rgb":{"red":.9,"green":.9,"blue":0}});
                     break;
                 case 75:
-                    drawAnimal({"x":len + anim.nX,"y":0,"z":width+anim.nZ},n);
+                    drawAnimal({"x":len + anim.nX,"y":0,"z":width+anim.nZ},n,anim.gRotate);
                     break;
                 case 6:
                     drawCube({"x": len, "y": 2, "z": width},
@@ -351,7 +363,7 @@ function drawTree(center,n) {
 
 }
 
-function drawAnimalCube(center, angle, scale, n, color, anim) {
+function drawAnimalCube(center, angle, scale, n, color, anim,gRotate) {
     nCubes ++;
     if (lastColorType !== color.type) {
         lastColorType = color.type;
@@ -363,8 +375,11 @@ function drawAnimalCube(center, angle, scale, n, color, anim) {
     } else if (color.type === 1) {
         gl.uniform1i(u_Sampler, color.texID);
     }
+    // console.log(gRotate);
+    // model.setRotate(gRotate,0,1,0);
 
     model.setTranslate(center.x, center.y, center.z);
+
     if (angle > 0) {
         model.rotate(angle,0,0,1);
     }
@@ -376,6 +391,7 @@ function drawAnimalCube(center, angle, scale, n, color, anim) {
         model.scale(scale.x, scale.y, scale.z);
     }
 
+
     // Pass the model view projection matrix to u_MvpMatrix
     gl.uniformMatrix4fv(u_Model, false, model.elements);
     // Clear color and depth buffer
@@ -384,27 +400,27 @@ function drawAnimalCube(center, angle, scale, n, color, anim) {
     gl.drawElements(gl.TRIANGLES, n, gl.UNSIGNED_BYTE, 0);
 }
 
-function drawAnimal(center,n) {
+function drawAnimal(center,n,gRotation) {
     drawAnimalCube({"x":center.x,"y":center.y+.5,"z":center.z}, 0,{"x":1.5,"y":.5,"z":1},n, //body
-        {"type":0,"rgb":{"red":0,"green":0,"blue":1}},{"x":0,"y":0,"z":0,"angle":0});
+        {"type":0,"rgb":{"red":0,"green":0,"blue":1}},{"x":0,"y":0,"z":0,"angle":0},gRotation);
 
     drawAnimalCube({"x":center.x+.25,"y":center.y+.5,"z":center.z}, 180,{"x":.25,"y":.5,"z":.25},n, //front left leg
-        {"type":0,"rgb":{"red":1,"green":0,"blue":0}},{"x":0,"y":0,"z":1,"angle":anim.angle});
+        {"type":0,"rgb":{"red":1,"green":0,"blue":0}},{"x":0,"y":0,"z":1,"angle":anim.angle},gRotation);
 
     drawAnimalCube({"x":center.x+1.25,"y":center.y+.5,"z":center.z}, 180,{"x":.25,"y":.5,"z":.25},n, //back left leg
-        {"type":0,"rgb":{"red":1,"green":0,"blue":0}},{"x":0,"y":0,"z":-1,"angle":anim.angle});
+        {"type":0,"rgb":{"red":1,"green":0,"blue":0}},{"x":0,"y":0,"z":-1,"angle":anim.angle},gRotation);
 
     drawAnimalCube({"x":center.x+.25,"y":center.y+.5,"z":center.z+.75}, 180,{"x":.25,"y":.5,"z":.25},n, //front right leg
-        {"type":0,"rgb":{"red":1,"green":0,"blue":0}},{"x":0,"y":0,"z":-1,"angle":anim.angle});
+        {"type":0,"rgb":{"red":1,"green":0,"blue":0}},{"x":0,"y":0,"z":-1,"angle":anim.angle},gRotation);
 
     drawAnimalCube({"x":center.x+1.25,"y":center.y+.5,"z":center.z+.75}, 180,{"x":.25,"y":.5,"z":.25},n, //back right leg
-        {"type":0,"rgb":{"red":1,"green":0,"blue":0}},{"x":0,"y":0,"z":1,"angle":anim.angle});
+        {"type":0,"rgb":{"red":1,"green":0,"blue":0}},{"x":0,"y":0,"z":1,"angle":anim.angle},gRotation);
 
     drawAnimalCube({"x":center.x,"y":center.y+.5,"z":center.z+.25}, 45,{"x":.5,"y":.75,"z":.5},n, //neck
-        {"type":0,"rgb":{"red":1,"green":0,"blue":1}},{"x":0,"y":0,"z":0,"angle":0});
+        {"type":0,"rgb":{"red":1,"green":0,"blue":1}},{"x":0,"y":0,"z":0,"angle":0},gRotation);
 
     drawAnimalCube({"x":center.x-.5,"y":center.y+1,"z":center.z+.175}, 0,{"x":.6,"y":.45,"z":.6},n, // head
-        {"type":0,"rgb":{"red":0,"green":1,"blue":1}},{"x":0,"y":0,"z":0,"angle":0});
+        {"type":0,"rgb":{"red":0,"green":1,"blue":1}},{"x":0,"y":0,"z":0,"angle":0},gRotation);
 
 }
 
