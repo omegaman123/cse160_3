@@ -270,7 +270,7 @@ function draw(n) {
             }
         }
     }
-    console.log(nCubes, ", ", nScale);
+    // console.log(nCubes, ", ", nScale);
     nCubes = 0;
     nScale = 0;
 }

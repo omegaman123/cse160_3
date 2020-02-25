@@ -3,8 +3,6 @@
   <component name="ChangeListManager">
     <list default="true" id="755e8bb3-45e4-496f-84df-1a812dd7da65" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/main.js" beforeDir="false" afterPath="$PROJECT_DIR$/main.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main1.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/main2.js" beforeDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/.tmp/" />
     <ignored path="$PROJECT_DIR$/temp/" />
@@ -38,8 +36,8 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/main.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-6892">
-              <caret line="185" column="8" selection-start-line="185" selection-start-column="8" selection-end-line="185" selection-end-column="8" />
+            <state relative-caret-position="322">
+              <caret line="272" column="4" selection-start-line="272" selection-start-column="7" selection-end-line="272" selection-end-column="18" />
               <folding>
                 <element signature="n#!!doc" expanded="true" />
               </folding>
@@ -72,6 +70,7 @@
       <find>gl.cle</find>
       <find>drawAni</find>
       <find>animate</find>
+      <find>console.log</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -146,12 +145,12 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1582234264160</updated>
-      <workItem from="1582234265445" duration="40067000" />
+      <workItem from="1582234265445" duration="40294000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="40067000" />
+    <option name="totallyTimeSpent" value="40294000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="342" y="23" width="1532" height="1157" extended-state="0" />
@@ -279,8 +278,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/main.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-6892">
-          <caret line="185" column="8" selection-start-line="185" selection-start-column="8" selection-end-line="185" selection-end-column="8" />
+        <state relative-caret-position="322">
+          <caret line="272" column="4" selection-start-line="272" selection-start-column="7" selection-end-line="272" selection-end-column="18" />
           <folding>
             <element signature="n#!!doc" expanded="true" />
           </folding>
